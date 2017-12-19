@@ -1,6 +1,7 @@
 // @flow
 
-import React, { PropTypes } from 'react';
+import React from "react";
+import PropTypes from "prop-type";
 import {
   Animated,
   BackAndroid,
@@ -15,15 +16,15 @@ import {
   TouchableNativeFeedback,
   TouchableWithoutFeedback,
   View,
-  ScrollView,
-} from 'react-native';
+  ScrollView
+} from "react-native";
 
 type ActionSheetOptions = {
   options: Array<string>,
   icons: ?Array<number>,
   destructiveButtonIndex: ?number,
   cancelButtonIndex: ?number,
-  textStyle: ?any,
+  textStyle: ?any
 };
 
 type ActionGroupProps = {
@@ -33,7 +34,7 @@ type ActionGroupProps = {
   onSelect: (i: number) => boolean,
   startIndex: number,
   length: number,
-  textStyle: ?any,
+  textStyle: ?any
 };
 
 type ActionSheetState = {
@@ -42,12 +43,12 @@ type ActionSheetState = {
   options: ?ActionSheetOptions,
   onSelect: ?(i: number) => void,
   overlayOpacity: any,
-  sheetOpacity: any,
+  sheetOpacity: any
 };
 
 type ActionSheetProps = {
   children: ?any,
-  useNativeDriver: ?boolean,
+  useNativeDriver: ?boolean
 };
 
 const OPACITY_ANIMATION_TIME = 150;
@@ -63,7 +64,7 @@ class ActionGroup extends React.Component {
     onSelect: PropTypes.func.isRequired,
     startIndex: PropTypes.number.isRequired,
     length: PropTypes.number.isRequired,
-    textStyle: Text.propTypes.style,
+    textStyle: Text.propTypes.style
   };
 
   render() {
@@ -74,20 +75,20 @@ class ActionGroup extends React.Component {
       onSelect,
       startIndex,
       length,
-      textStyle,
+      textStyle
     } = this.props;
 
     let optionViews = [];
 
     let nativeFeedbackBackground = TouchableNativeFeedbackSafe.Ripple(
-      'rgba(180, 180, 180, 1)',
+      "rgba(180, 180, 180, 1)",
       false
     );
 
     for (let i = startIndex; i < startIndex + length; i++) {
-      let color = '#444444';
+      let color = "#444444";
       if (i === destructiveButtonIndex) {
-        color = '#ff3b30';
+        color = "#ff3b30";
       }
 
       let iconElement = undefined;
@@ -102,14 +103,17 @@ class ActionGroup extends React.Component {
           pressInDelay={0}
           background={nativeFeedbackBackground}
           onPress={() => onSelect(i)}
-          style={styles.button}>
+          style={styles.button}
+        >
           {iconElement}
           <Text style={[styles.text, { color }, textStyle]}>{options[i]}</Text>
         </TouchableNativeFeedbackSafe>
       );
 
       if (i < startIndex + length - 1) {
-        optionViews.push(<View key={`separator-${i}`} style={styles.rowSeparator} />);
+        optionViews.push(
+          <View key={`separator-${i}`} style={styles.rowSeparator} />
+        );
       }
     }
 
@@ -132,7 +136,7 @@ export default class ActionSheet extends React.Component {
     options: null,
     onSelect: null,
     overlayOpacity: new Animated.Value(0),
-    sheetOpacity: new Animated.Value(0),
+    sheetOpacity: new Animated.Value(0)
   };
 
   render() {
@@ -142,8 +146,8 @@ export default class ActionSheet extends React.Component {
         style={[
           styles.overlay,
           {
-            opacity: this.state.overlayOpacity,
-          },
+            opacity: this.state.overlayOpacity
+          }
         ]}
       />
     ) : null;
@@ -178,12 +182,13 @@ export default class ActionSheet extends React.Component {
                 {
                   scale: this.state.sheetOpacity.interpolate({
                     inputRange: [0, 0.5, 1],
-                    outputRange: [0.6, 1, 1],
-                  }),
-                },
-              ],
-            },
-          ]}>
+                    outputRange: [0.6, 1, 1]
+                  })
+                }
+              ]
+            }
+          ]}
+        >
           <View style={styles.sheet}>
             <ActionGroup
               options={this.state.options.options}
@@ -213,7 +218,7 @@ export default class ActionSheet extends React.Component {
       options,
       onSelect,
       isVisible: true,
-      isAnimating: true,
+      isAnimating: true
     });
 
     this.state.overlayOpacity.setValue(0);
@@ -224,25 +229,28 @@ export default class ActionSheet extends React.Component {
         toValue: 0.5,
         easing: Easing.in(Easing.linear),
         duration: OPACITY_ANIMATION_TIME,
-        useNativeDriver: this.props.useNativeDriver,
+        useNativeDriver: this.props.useNativeDriver
       }),
       Animated.timing(this.state.sheetOpacity, {
         toValue: 1,
         easing: Easing.in(Easing.linear),
         duration: OPACITY_ANIMATION_TIME,
-        useNativeDriver: this.props.useNativeDriver,
-      }),
+        useNativeDriver: this.props.useNativeDriver
+      })
     ]).start(result => {
       if (result.finished) {
         this.setState({
-          isAnimating: false,
+          isAnimating: false
         });
       }
     });
 
     this._animateOutCallback = onAnimateOut;
 
-    BackAndroid.addEventListener('actionSheetHardwareBackPress', this._selectCancelButton);
+    BackAndroid.addEventListener(
+      "actionSheetHardwareBackPress",
+      this._selectCancelButton
+    );
   }
 
   _selectCancelButton = () => {
@@ -250,7 +258,7 @@ export default class ActionSheet extends React.Component {
       return false;
     }
 
-    if (typeof this.state.options.cancelButtonIndex === 'number') {
+    if (typeof this.state.options.cancelButtonIndex === "number") {
       return this._onSelect(this.state.options.cancelButtonIndex);
     } else {
       return this._animateOut();
@@ -271,10 +279,13 @@ export default class ActionSheet extends React.Component {
       return false;
     }
 
-    BackAndroid.removeEventListener('actionSheetHardwareBackPress', this._selectCancelButton);
+    BackAndroid.removeEventListener(
+      "actionSheetHardwareBackPress",
+      this._selectCancelButton
+    );
 
     this.setState({
-      isAnimating: true,
+      isAnimating: true
     });
 
     Animated.parallel([
@@ -282,21 +293,21 @@ export default class ActionSheet extends React.Component {
         toValue: 0,
         easing: Easing.in(Easing.linear),
         duration: OPACITY_ANIMATION_TIME,
-        useNativeDriver: this.props.useNativeDriver,
+        useNativeDriver: this.props.useNativeDriver
       }),
       Animated.timing(this.state.sheetOpacity, {
         toValue: 0,
         easing: Easing.in(Easing.linear),
         duration: OPACITY_ANIMATION_TIME,
-        useNativeDriver: this.props.useNativeDriver,
-      }),
+        useNativeDriver: this.props.useNativeDriver
+      })
     ]).start(result => {
       if (result.finished) {
         this.setState({
           isVisible: false,
-          isAnimating: false,
+          isAnimating: false
         });
-        if (typeof this._animateOutCallback === 'function') {
+        if (typeof this._animateOutCallback === "function") {
           this._animateOutCallback();
           this._animateOutCallback = null;
         }
@@ -308,12 +319,13 @@ export default class ActionSheet extends React.Component {
 }
 
 ActionSheet.defaultProps = {
-  useNativeDriver: true,
+  useNativeDriver: true
 };
 
 let TouchableComponent;
 
-TouchableComponent = Platform.Version <= 20 ? TouchableOpacity : TouchableNativeFeedback;
+TouchableComponent =
+  Platform.Version <= 20 ? TouchableOpacity : TouchableNativeFeedback;
 
 if (TouchableComponent !== TouchableNativeFeedback) {
   TouchableComponent.SelectableBackground = () => ({});
@@ -334,62 +346,66 @@ class TouchableNativeFeedbackSafe extends React.Component {
         </TouchableComponent>
       );
     } else {
-      return <TouchableComponent {...this.props}>{this.props.children}</TouchableComponent>;
+      return (
+        <TouchableComponent {...this.props}>
+          {this.props.children}
+        </TouchableComponent>
+      );
     }
   }
 }
 
 let styles = StyleSheet.create({
   groupContainer: {
-    backgroundColor: '#fefefe',
+    backgroundColor: "#fefefe",
     borderRadius: 4,
-    borderColor: '#cbcbcb',
+    borderColor: "#cbcbcb",
     borderWidth: PIXEL,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 8
   },
   button: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "row",
     height: 50,
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   icon: {
-    marginRight: 15,
+    marginRight: 15
   },
   text: {
     fontSize: 17,
-    fontWeight: '700',
-    textAlignVertical: 'center',
+    fontWeight: "700",
+    textAlignVertical: "center"
   },
   rowSeparator: {
-    backgroundColor: '#dddddd',
+    backgroundColor: "#dddddd",
     height: 1,
-    flex: 1,
+    flex: 1
   },
   overlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'black',
+    backgroundColor: "black"
   },
   sheetContainer: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
     top: 0,
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row"
   },
   sheet: {
     flex: 1,
-    backgroundColor: 'transparent',
-  },
+    backgroundColor: "transparent"
+  }
 });
