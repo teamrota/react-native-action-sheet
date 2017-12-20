@@ -1,7 +1,7 @@
 // @flow
 
 import React from "react";
-import PropTypes from "prop-type";
+import PropTypes from "prop-types";
 import {
   Animated,
   BackAndroid,
